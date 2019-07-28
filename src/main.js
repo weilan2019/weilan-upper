@@ -8,11 +8,15 @@ import socketIo from "./classes/socketIoplugin"
 import gamepad from "./classes/gamePadplugin"
 import store from "./store/index"
 import axios from "axios"
+import echarts from 'echarts'
+
 
 Vue.use(socketIo);
 Vue.use(gamepad);
 Vue.prototype.$axios = axios;
+Vue.prototype.$echarts = echarts;
 Vue.config.productionTip = false
+
 
 /* eslint-disable no-new */
 new Vue({

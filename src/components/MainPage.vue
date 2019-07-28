@@ -5,6 +5,11 @@
     </div>
     <div class="source" ref="source" :style="{'background-image':`url(${$store.state.viewbox[4] ? $store.getters.videoStream : ''})`}"></div>
     <!-- <div class="source" ref="source"></div> -->
+    <div class="leftPanel">
+        <transition name="fade">
+          <JudgeDepth v-if="$store.state.viewbox[5]"/>
+        </transition>
+    </div>
     <div class="rightPanel">
       <transition name="fade">
         <ControlPanel v-if="$store.state.viewbox[0]" name="概览">
@@ -24,7 +29,7 @@
     </div>
     <transition name="fadeUp">
       <MavLinkCtrl v-show="$store.state.viewbox[3]" />
-    </transition>
+    </transition>  
   </div>
 </template>
 
@@ -33,6 +38,7 @@ import TrackerVideo from "@/classes/TrackerVideo";
 import ControlPanel from "./ControlPanel";
 import { DispatchHTMLEvent } from "@/classes/util";
 import MavLinkCtrl from "./MavLinkCtrl";
+import JudgeDepth from "./JudgeDepth";
 import PwmPanel from "./PwmPanel";
 import SensorPanel from "./SensorPanel";
 import TextPanel from "./TextPanel";
@@ -42,6 +48,7 @@ export default {
     ControlPanel,
     PwmPanel,
     MavLinkCtrl,
+    JudgeDepth,
     SensorPanel,
     TextPanel
   },
@@ -118,6 +125,14 @@ export default {
     > * {
       min-height: 180px;
     }
+  }
+  .leftPanel{
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    left: 30px;
+    width: 320px;
+    top: 100px;
   }
   .source {
     position: fixed;

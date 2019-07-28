@@ -32,31 +32,38 @@ function install(Vue) {
 
   connect();
 
-  setTimeout(() => {
-    Vue.prototype.$socket.emit('mavlink', {
-      type: "request_data_stream",
-      args: [
-        $mavlink.target_system,
-        $mavlink.target_component,
-        mavlink.MAV_DATA_STREAM_ALL,
-        5,
-        1
-      ]
-    });
 
-    setInterval(() => {
-      Vue.prototype.$socket.emit('mavlink', {
-        type: "heartbeat",
-        args: [
-          mavlink.MAV_TYPE_GCS,
-          mavlink.MAV_AUTOPILOT_INVALID,
-          0,
-          0,
-          0
-        ]
-      });
-    }, 1000);
-  }, 1000);
+  const websocket = new WebSocket('ws://192.168.1.76:5001');
+  Vue.prototype.$websocket = websocket;
+  websocket.onopen = () => {
+	console.log('connect');
+	setTimeout(() => {
+		Vue.prototype.$websocket.go(new mavlink.messages.request_data_stream(1, 1, mavlink.MAV_DATA_STREAM_ALL, 5, 1));
+	}, 1000);	
+	let timer = setInterval(() => {
+		Vue.prototype.$websocket.go({ type: 'heatbeat', args: [mavlink.MAV_TYPE_GCS, mavlink.MAV_AUTOPILOT_INVALID, 0, 0, 0]});
+	},1000);
+	setTimeout(() => {
+		Vue.prototype.$socket.on('mavMessage', (message) => {
+			let msg = Vue.prototype.$mavlink.parseBuffer(Buffer.from(message));
+		});		
+	}, 1000);
+  }
+  websocket.onclose = () => {
+	cleatInterval(timer);	
+  }
+
+  function go(args) {
+	if(args.type) {
+		console.log(1);
+		Vue.prototype.$websocket.send(Buffer.from(JSON.stringify(args)));
+	}else {
+		console.log(2);
+		let message = new Buffer(args.pack(mavlink.MAVLink));
+		Vue.prototype.$websocket.send(message);
+	}
+  }
+  Vue.prototype.$websocket.go = go;
 }
 
 export default {

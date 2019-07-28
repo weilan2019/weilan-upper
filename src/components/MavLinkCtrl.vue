@@ -24,7 +24,7 @@
 <script>
 import JoyStickSingle from "./JoyStickSingle";
 import { createWatchList, JoyStickFilter } from "@/classes/util";
-
+import mavlink from '../assets/mavlink.js';
 const watch = createWatchList(
   {
     rov: {
@@ -70,22 +70,21 @@ export default {
     },
     armed(val) {
       if (this.myarm !== -1) {
-        this.$socket.emit("mavlink", {
-          type: "command_long",
-          args: [
-            this.$mavlink.target_system,
-            this.$mavlink.target_component,
-            this.$mavlink.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-            0,
-            val ? 1 : 0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ]
-        });
+		  console.log(mavlink.messages);
+		  console.log(mavlink.messages.command_long);
+		this.$websocket.go(
+				new mavlink.messages.command_long(
+					this.$mavlink.targt_system, 
+					this.$mavlink.target_component, 
+					this.$mavlink.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 
+					0, 
+					val ? 1 : 0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0));
         this.myarm = 1;
       }
 
@@ -103,16 +102,19 @@ export default {
         rjoy: { axis: raxis }
       } = this.$refs;
       this.handTimerId = setInterval(() => {
-        let args=[this.$mavlink.target_system, Math.round(laxis.y * 1000),
+        let cmd ={
+			type: 'manual_control', 
+			args: [
+			this.$mavlink.target_system, 
+			Math.round(laxis.y * 1000),
             Math.round(laxis.x * 1000),
             Math.round(raxis.y * 500 + 500),
             Math.round(raxis.x * 1000),
-            this.btngroup]
-        console.log(args);
-        this.$socket.emit("mavlink", {
-          type: "manual_control",
-          args: args
-        });
+            this.btngroup
+			]
+		}
+        console.log(cmd);
+        this.$websocket.go(cmd);
       }, 50);
     },
     unHandleAxis() {
