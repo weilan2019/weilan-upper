@@ -15,7 +15,7 @@
     "jspack": "0.0.4",
     "node-sass": "^4.9.2",
     "sass-loader": "^7.0.1",
-    "socket.io": "^2.1.1",
+    "socket.io": "^2.5.0",
     "tracking": "^1.1.3",
     "underscore": "^1.9.1",
     "uws": "^99.0.0",
